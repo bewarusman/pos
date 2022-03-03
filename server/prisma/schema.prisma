@@ -1,0 +1,60 @@
+datasource postgres {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  createdAt DateTime @default(now())
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     String[]
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+model Product {
+  barcode            String              @unique
+  createdAt          DateTime            @default(now())
+  id                 String              @id @default(cuid())
+  name               String
+  price              Float?
+  purchaseOrderItems PurchaseOrderItem[]
+  updatedAt          DateTime            @updatedAt
+}
+
+model PurchaseOrder {
+  createdAt     DateTime            @default(now())
+  id            String              @id @default(cuid())
+  purchaseOrder PurchaseOrderItem[]
+  total         Float?
+  updatedAt     DateTime            @updatedAt
+  vendor        Vendor?             @relation(fields: [vendorId], references: [id])
+  vendorId      String?
+}
+
+model PurchaseOrderItem {
+  createdAt DateTime       @default(now())
+  id        String         @id @default(cuid())
+  order     PurchaseOrder? @relation(fields: [orderId], references: [id])
+  orderId   String?
+  product   Product?       @relation(fields: [productId], references: [id])
+  productId String?
+  updatedAt DateTime       @updatedAt
+}
+
+model Vendor {
+  address        String?
+  createdAt      DateTime        @default(now())
+  email          String?
+  id             String          @id @default(cuid())
+  name           String?
+  phone          String?
+  purchaseOrders PurchaseOrder[]
+  updatedAt      DateTime        @updatedAt
+}
